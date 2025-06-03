@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+</head>
+<body>
+    <h2><%= obj %></h2>
+    <div class="group-form">
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" id="fileInput" name="file" />
+        <button type="submit">Upload</button>
+    </form>
+    </div>
+
+    <p id="message"></p> <!-- To show success/error messages -->
+
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+document.getElementById("uploadForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const fileInput = document.getElementById("fileInput");
+    if (!fileInput.files.length) {
+        alert("Please select a file!");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", fileInput.files[0]); // ✅ Append file
+
+    try {
+        const response = await axios.post("/upload", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        });
+
+        document.getElementById("message").innerText = response.data.message;
+
+        if (response.data.status) {
+            setTimeout(() => window.location.reload(), 2000); // Reload after success
+        }
+    } catch (error) {
+        console.error("Upload failed", error);
+        document.getElementById("message").innerText = "Upload failed. Try again.";
+    }
+});
+</script>
+
+</html>
